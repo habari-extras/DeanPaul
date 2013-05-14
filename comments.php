@@ -42,7 +42,7 @@ else { ?>
 <?php } ?>
      </ol>
 
-<?php if ( ! $post->info->comments_disabled ) { include_once( 'commentform.php' ); } ?>
+<?php if ( ! $post->info->comments_disabled ) { $post->comment_form()->out(); } ?>
 
      <hr>
 
