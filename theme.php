@@ -14,6 +14,24 @@ define( 'THEME_CLASS', 'MyTheme' );
  */
 class MyTheme extends Theme
 {
+	protected $defaults = array(
+		'login_display_location' => 'sidebar',
+		'home_label' => 'Blog',
+		'show_author' => false,
+	);
+
+	/**
+	 * Add the K2 menu block to the nav area upon theme activation if there's nothing already there
+	 */
+	public function action_theme_activated()
+	{
+		$opts = Options::get_group( __CLASS__ );
+		if ( empty( $opts ) ) {
+			Options::set_group( __CLASS__, $this->defaults );
+		}
+
+	}
+
 	/**
 	 * Execute on theme init to apply these filters to output
 	 */
@@ -51,9 +69,9 @@ Format::apply( 'tag_and_list', 'post_tags_out' );
 	public function add_template_vars()
 	{
 		//Theme Options
-		$this->assign('home_tab','Blog'); //Set to whatever you want your first tab text to be.
-		$this->assign( 'show_author' , false ); //Display author in posts
-
+		$this->assign( 'display_login', Options::get( __CLASS__ . '__login_display_location', 'sidebar' ) );
+		$this->assign( 'home_label' , Options::get( __CLASS__ . '__home_label', _t( 'Blog' ) ) );
+		$this->assign( 'show_author', Options::get( __CLASS__ . '__show_author', false ) );
 
 		if( !$this->template_engine->assigned( 'pages' ) ) {
 			$this->assign('pages', Posts::get( array( 'content_type' => 'page', 'status' => Post::status('published'), 'nolimit' => 1 ) ) );
@@ -67,6 +85,63 @@ Format::apply( 'tag_and_list', 'post_tags_out' );
 		if ( User::identify()->loggedin ) {
 			Stack::add( 'template_header_javascript', Site::get_url('scripts') . '/jquery.js', 'jquery' );
 		}
+	}
+
+	/**
+	 * function action_theme_ui
+	 * Create and display the Theme configuration
+	 **/
+	public function action_theme_ui()
+	{
+		$opts = Options::get_group( __CLASS__ );
+		if ( empty( $opts ) ) {
+			Options::set_group( __CLASS__, $this->defaults );
+		}
+
+		$controls = array();
+		$controls['home_label'] = array(
+			'label' => _t('Home tab label:', 'deanpaul'),
+			'type' => 'text'
+		);
+		$controls['login_display_location'] = array(
+			'label' => _t('Login display:', 'deanpaul'),
+			'type' => 'select',
+			'options' => array(
+				'nowhere' => _t( 'Nowhere', 'deanpaul' ),
+				'header' => _t( 'As a navigation tab', 'deanpaul' ),
+				'sidebar' => _t( 'In the sidebar', 'deanpaul' )
+			)
+		);
+		$controls['show_author'] = array(
+			'label' => _t( 'Display author:', 'deanpaul' ),
+			'type' => 'checkbox',
+		);
+
+		$ui = new FormUI( strtolower( get_class( $this ) ) );
+		$wrapper = $ui->append( 'wrapper', 'config', 'config' );
+		$wrapper->class = "settings clear";
+
+		foreach ( $controls as $option_name => $option ) {
+			$field = $wrapper->append( $option['type'], $option_name, __CLASS__. '__' . $option_name, $option['label'] );
+			$field->template = 'optionscontrol_' . $option['type'];
+			$field->class = "item clear";
+			if ( $option['type'] === 'select' and isset( $option['options'] ) ) {
+				$field->options = $option['options'];
+			}
+		}
+		$ui->append( 'submit', 'save', _t( 'Save', 'deanpaul' ) );
+		$ui->on_success( array( $this, 'config_updated') );
+		$ui->out();
+	}
+
+	/**
+	 * function config_updated
+	 * Return a success message
+	 **/
+	public function config_updated( $ui )
+	{
+		Session::notice( _t( 'Configuration updated', 'deanpaul' ) );
+		$ui->save();
 	}
 
 	public function k2_comment_class( $comment, $post )

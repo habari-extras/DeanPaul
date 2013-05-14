@@ -8,4 +8,9 @@
 	<description>Theme for DeanPaul.net</description>
 	<license url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License 2.0</license>
 	<guid>2F999409-41DD-4CE4-A878-8029A68D69B4</guid>
+	<areas>
+		<area name="sidebar">
+			<description><![CDATA[Sidebar]]></description>
+		</area>
+	</areas>
 </pluggable>
