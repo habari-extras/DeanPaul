@@ -86,7 +86,9 @@ Format::apply( 'tag_and_list', 'post_tags_out' );
 		$class.= '"';
 		return $class;
 	}
-
+	public function action_form_comment( $form ) {
+        $form->cf_content->caption = '';
+	}
 }
 
 ?>

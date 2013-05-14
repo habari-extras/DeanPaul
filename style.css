@@ -558,7 +558,10 @@ li.bypostauthor blockquote {
 	margin: 0;
 	}
 
-.comments input[type=text], .comments textarea {
+.comments input[type=text],
+.comments input[type=email],
+.comments input[type=url],
+.comments textarea {
 	font: 1.2em 'Courier New', Courier, Monospace;
 	padding: 3px;
 	color: #777;
@@ -570,9 +573,16 @@ input[type=text]:focus, textarea:focus {
 	border-color: #666;
 	}
 
-.comments form input[type=text] {
+.comments form input[type=text],
+.comments form input[type=email],
+.comments form input[type=url] {
 	width: 45%;
 	margin: 5px 5px 1px 0;
+	}
+
+.comments label {
+	display: inline-block;
+	width: 20%;
 	}
 
 .comments textarea {
